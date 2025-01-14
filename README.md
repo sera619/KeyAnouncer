@@ -29,3 +29,28 @@ Compatible with World of Warcraft's latest expansion and patch.
 >
 > ![KeyAnouncer Chat](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnouncer_Chat.png?raw=true)
 
+## Changelog
+
+Version 1.0.0 - Initial Release
+
+- Added functionality to automatically detect the player's Mythic+ keystone from their inventory.
+- Implemented an addon communication system to share keystone information with other party members.
+- Displayed keystone details of party members in the chat window.
+- Registered the addon with the MyKeystoneAddon communication prefix.
+
+
+Version 1.1.0- Improved Usability
+
+- Enhanced compatibility with different inventory setups to ensure keystone detection works seamlessly.
+- Improved chat output formatting for better readability of shared keystone information.
+- Added error handling for scenarios where no keystone is found.
+
+
+Version 1.1.1- New Features and Fixes
+
+- Fixed a bug where keystone data was not sent to the party after reloading the UI.
+
+
+Version 1.1.2 - Optimization
+
+- Minor fixes to improve stability and compatibility with the latest WoW patch.
