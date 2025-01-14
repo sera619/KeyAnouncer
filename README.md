@@ -22,8 +22,10 @@ Compatible with World of Warcraft's latest expansion and patch.
 ## Screenshots
 > Settingsframe
 > 
-> ![KeyAnouncer Settingswindow](Icons\KeyAnouncer_UI.png)
+> ![KeyAnouncer Settingswindow](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnouncer_UI.png?raw=true)
+
 
 > Chatwindow
 >
-> ![KeyAnouncer Chat](Icons\KeyAnouncer_Chat.png)
+> ![KeyAnouncer Chat](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnouncer_Chat.png?raw=true)
+
