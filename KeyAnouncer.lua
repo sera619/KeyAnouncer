@@ -15,7 +15,7 @@ local isEnabled = true
 local isPartyChatEnabled = true
 local isGuidChatEnabled = true
 local showOnLogin = false
-local addonVersion = "1.2.0"
+local addonVersion = "1.2.3"
 local postCooldown = 8
 
 local lastPostTime = 0

@@ -1,9 +1,9 @@
 ## Interface: 110007
-## Title: |cff00fcfcKeyAnouncer|r 1.1.4
-## Version: 1.1.4
+## Title: |cff00fcfcKeyAnouncer|r 1.2.3
+## Version: 1.2.3
 ## Author: S3R43o3
 ## Notes: An addon to announce your keystone in chat
 ## SavedVariables: KeyAnouncerDB
-## Icon: Icons/KeyAnouncerIcon.tga
+## Icon: Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga
 
 KeyAnouncer.lua
