@@ -54,3 +54,7 @@ Version 1.1.1- New Features and Fixes
 Version 1.1.2 - Optimization
 
 - Minor fixes to improve stability and compatibility with the latest WoW patch.
+  
+Version 1.1.4 - Bugfix
+
+- set correct current wow interfacenumber

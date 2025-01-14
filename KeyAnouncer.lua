@@ -13,7 +13,7 @@ local isEnabled = true
 local isPartyChatEnabled = true
 local isGuidChatEnabled = true
 local showOnLogin = false
-local addonVersion = "1.1.2"
+local addonVersion = "1.1.4"
 
 local windowHeight = 250
 local windowWidth = 250
