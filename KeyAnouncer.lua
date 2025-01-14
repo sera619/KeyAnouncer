@@ -7,19 +7,23 @@
 local addonName, addonTable = ...
 local KeyAnouncer = CreateFrame("Frame")
 KeyAnouncerDB = KeyAnouncerDB or {}
+-- load libs
+local LDB = LibStub("LibDataBroker-1.1")
+local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local informationText = "Automatic link your keystone in guild or party chat if '!keys' is typped in chat."
 local isEnabled = true
 local isPartyChatEnabled = true
 local isGuidChatEnabled = true
 local showOnLogin = false
-local addonVersion = "1.1.4"
+local addonVersion = "1.1.2"
 
 local windowHeight = 250
 local windowWidth = 250
 -- Position around the minimap
 local minimapButtonPosition = 0
 local keystone = nil
+
 
 -- function to find and return players keystone
 local function GetMythicKeystone()
@@ -43,6 +47,29 @@ local frame = CreateFrame("Frame", "KeyAnouncerFrame", UIParent, "BasicFrameTemp
 frame:SetSize(windowWidth, windowHeight)
 frame:SetPoint("CENTER")
 frame:Hide()
+
+-- create DataBroker object
+local dataObject = LDB:NewDataObject("KeyAnouncer",{
+    type = "launcher",
+    text = "KeyAnouncer",
+    icon = "Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga",
+    OnClick = function (_, button)
+        if button == "LeftButton" then
+            if frame:IsShown() then
+                frame:Hide()
+            else
+                frame:Show()
+            end
+        end
+    end,
+    OnTooltipShow = function (tooltip)
+        tooltip:AddLine("KeyAnouncer", 1, 1, 1)
+        tooltip:AddLine("Left-click to show/hide the addon window.", nil, nil, nil, true)
+    end
+})
+
+-- Register minimapicon
+LDBIcon:Register("KeyAnouncer", dataObject, KeyAnouncerDB.MinimapIcon)
 
 -- Title
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMed2")
@@ -116,39 +143,40 @@ versionText:SetPoint("BOTTOM", frame, "BOTTOM", 0, 10)
 versionText:SetTextScale(0.8)
 versionText:SetText('v' .. addonVersion .. " © S3R43o3 2025")
 
--- Minimap Button
-local minimapButton = CreateFrame("Button", "KeyAnouncerMinimapButton", Minimap)
-minimapButton:SetSize(24, 24)
-minimapButton:SetFrameStrata("MEDIUM")
-minimapButton:SetFrameLevel(8)
-minimapButton:SetParent(Minimap)
--- minimapButton:SetNormalTexture('Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga')
--- minimapButton:SetHighlightTexture(136477) -- Highlight texture ID for WoW UI
-
-local buttonIcon = minimapButton:CreateTexture(nil, "BACKGROUND")
-buttonIcon:SetTexture('Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga') -- Default gear icon
-buttonIcon:SetSize(24, 24)
-buttonIcon:SetPoint("CENTER")
-
--- Function to update Minimap Button position
-local function UpdateMinimapButtonPosition()
-    local angle = math.rad(minimapButtonPosition) - 40
-    local x = cos(angle) * 80
-    local y = sin(angle) * 80
-    minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
-end
-
-UpdateMinimapButtonPosition()
-
-minimapButton:SetScript("OnClick", function()
-    if frame:IsShown() then
-        frame:Hide()
-    else
-        frame:Show()
+--[[
+    Minimap Button
+    local minimapButton = CreateFrame("Button", "KeyAnouncerMinimapButton", Minimap)
+    minimapButton:SetSize(24, 24)
+    minimapButton:SetFrameStrata("MEDIUM")
+    minimapButton:SetFrameLevel(8)
+    minimapButton:SetParent(Minimap)
+    -- minimapButton:SetNormalTexture('Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga')
+    -- minimapButton:SetHighlightTexture(136477) -- Highlight texture ID for WoW UI
+    
+    local buttonIcon = minimapButton:CreateTexture(nil, "BACKGROUND")
+    buttonIcon:SetTexture('Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga') -- Default gear icon
+    buttonIcon:SetSize(24, 24)
+    buttonIcon:SetPoint("CENTER")
+    
+    -- Function to update Minimap Button position
+    local function UpdateMinimapButtonPosition()
+        local angle = math.rad(minimapButtonPosition) - 40
+        local x = cos(angle) * 80
+        local y = sin(angle) * 80
+        minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
     end
-end)
-
-minimapButton:SetScript("OnEnter", function(self)
+    
+    UpdateMinimapButtonPosition()
+    
+    minimapButton:SetScript("OnClick", function()
+        if frame:IsShown() then
+            frame:Hide()
+        else
+            frame:Show()
+        end
+    end)
+    
+    minimapButton:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_PRESERVE")
     GameTooltip:SetText("KeyAnouncer", 1, 1, 1)
     GameTooltip:AddLine("Click to show/hide the addon window.", nil, nil, nil, true)
@@ -159,6 +187,7 @@ end)
 minimapButton:SetScript("OnLeave", function()
     GameTooltip:Hide()
 end)
+]] 
 
 -- Load Settings on Login
 -- Register events
@@ -172,6 +201,13 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" or event == "PLAYER_ENTERING_WORLD" then
         local addonName = ...
         if addonName == addonName then
+            KeyAnouncerDB.MinimapIcon = KeyAnouncerDB.MinimapIcon or {hide = false}
+
+            if KeyAnouncerDB.MinimapIcon.hide then
+                LDBIcon:Hide("KeyAnouncer")
+            else
+                LDBIcon:Show("KeyAnouncer")
+            end
             -- Lade Einstellungen, wenn das Addon geladen wurde
             isEnabled = KeyAnouncerDB.isEnabled ~= nil and KeyAnouncerDB.isEnabled or true
             showOnLogin = KeyAnouncerDB.showOnLogin ~= nil and KeyAnouncerDB.showOnLogin or true
@@ -182,7 +218,7 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
             loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Lade Einstellung
             partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)
             guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuidChatEnabled)
-            UpdateMinimapButtonPosition()
+            -- UpdateMinimapButtonPosition()
             if KeyAnouncerDB.showOnLogin == true then
                 frame:Show()
             else
