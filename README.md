@@ -63,3 +63,4 @@ Version 1.2.3 - Improved Usability
 
 - setup a moveable minimap icon
 - add cooldown to prevent chatspam
+- code refactoring
