@@ -16,7 +16,7 @@ local isEnabled = true
 local isPartyChatEnabled = true
 local isGuidChatEnabled = true
 local showOnLogin = false
-local addonVersion = "1.1.2"
+local addonVersion = "1.2.0"
 
 local windowHeight = 250
 local windowWidth = 250
@@ -143,53 +143,6 @@ versionText:SetPoint("BOTTOM", frame, "BOTTOM", 0, 10)
 versionText:SetTextScale(0.8)
 versionText:SetText('v' .. addonVersion .. " © S3R43o3 2025")
 
---[[
-    Minimap Button
-    local minimapButton = CreateFrame("Button", "KeyAnouncerMinimapButton", Minimap)
-    minimapButton:SetSize(24, 24)
-    minimapButton:SetFrameStrata("MEDIUM")
-    minimapButton:SetFrameLevel(8)
-    minimapButton:SetParent(Minimap)
-    -- minimapButton:SetNormalTexture('Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga')
-    -- minimapButton:SetHighlightTexture(136477) -- Highlight texture ID for WoW UI
-    
-    local buttonIcon = minimapButton:CreateTexture(nil, "BACKGROUND")
-    buttonIcon:SetTexture('Interface/AddOns/KeyAnouncer/Icons/KeyAnouncerIcon.tga') -- Default gear icon
-    buttonIcon:SetSize(24, 24)
-    buttonIcon:SetPoint("CENTER")
-    
-    -- Function to update Minimap Button position
-    local function UpdateMinimapButtonPosition()
-        local angle = math.rad(minimapButtonPosition) - 40
-        local x = cos(angle) * 80
-        local y = sin(angle) * 80
-        minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
-    end
-    
-    UpdateMinimapButtonPosition()
-    
-    minimapButton:SetScript("OnClick", function()
-        if frame:IsShown() then
-            frame:Hide()
-        else
-            frame:Show()
-        end
-    end)
-    
-    minimapButton:SetScript("OnEnter", function(self)
-    GameTooltip:SetOwner(self, "ANCHOR_PRESERVE")
-    GameTooltip:SetText("KeyAnouncer", 1, 1, 1)
-    GameTooltip:AddLine("Click to show/hide the addon window.", nil, nil, nil, true)
-    -- GameTooltip:AddLine("Drag to move around the minimap.", nil, nil, nil, true)
-    GameTooltip:Show()
-end)
-
-minimapButton:SetScript("OnLeave", function()
-    GameTooltip:Hide()
-end)
-]] 
-
--- Load Settings on Login
 -- Register events
 KeyAnouncer:RegisterEvent("CHAT_MSG_PARTY")
 KeyAnouncer:RegisterEvent("CHAT_MSG_PARTY_LEADER")
