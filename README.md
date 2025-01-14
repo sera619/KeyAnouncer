@@ -22,8 +22,8 @@ Compatible with World of Warcraft's latest expansion and patch.
 ## Screenshots
 > Settingsframe
 > 
-> ![KeyAnouncer Settingswindow](.\Icons\KeyAnouncer_UI.png)
+> ![KeyAnouncer Settingswindow](Icons\KeyAnouncer_UI.png)
 
 > Chatwindow
 >
-> ![KeyAnouncer Chat](.\Icons\KeyAnouncer_Chat.png)
+> ![KeyAnouncer Chat](Icons\KeyAnouncer_Chat.png)
