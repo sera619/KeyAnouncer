@@ -1,7 +1,6 @@
 -- WoW Addon "KeyAnouncer"
 
 -- TODO: 
--- - make minimapbutton moveable
 -- - show partymember keys in sepperate window
 
 local addonName, addonTable = ...
@@ -17,13 +16,20 @@ local isPartyChatEnabled = true
 local isGuidChatEnabled = true
 local showOnLogin = false
 local addonVersion = "1.2.0"
+local postCooldown = 8
+
+local lastPostTime = 0
+local canPostKey = true
 
 local windowHeight = 250
 local windowWidth = 250
--- Position around the minimap
 local minimapButtonPosition = 0
 local keystone = nil
 
+-- function to get actual time 
+local function GetTimeNow()
+    return time()
+end
 
 -- function to find and return players keystone
 local function GetMythicKeystone()
@@ -192,6 +198,11 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
             return
         end
         if message == "!keys" then
+            local now = GetTimeNow()
+            if now - lastPostTime < postCooldown then
+                local remaining = postCooldown - (now - lastPostTime)
+                return
+            end
             keystone = GetMythicKeystone()
             if keystone ~= "" then
                 if event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" then
@@ -205,6 +216,7 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
                     end
                     SendChatMessage(keystone.hyperlink, "GUILD")
                 end
+                lastPostTime = now
             else
                 -- print("No keystone found!")
                 return
