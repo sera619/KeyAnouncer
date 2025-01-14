@@ -58,3 +58,8 @@ Version 1.1.2 - Optimization
 Version 1.1.4 - Bugfix
 
 - set correct current wow interfacenumber
+
+Version 1.2.3 - Improved Usability
+
+- setup a moveable minimap icon
+- add cooldown to prevent chatspam
