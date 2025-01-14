@@ -18,3 +18,12 @@ Keystone Tracker is a simple yet effective addon for World of Warcraft that allo
 All party members need to have the addon installed for full functionality.
 
 Compatible with World of Warcraft's latest expansion and patch.
+
+## Screenshots
+> Settingsframe
+> 
+> ![KeyAnouncer Settingswindow](.\Icons\KeyAnouncer_UI.png)
+
+> Chatwindow
+>
+> ![KeyAnouncer Chat](.\Icons\KeyAnouncer_Chat.png)
