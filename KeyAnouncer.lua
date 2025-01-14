@@ -1,7 +1,13 @@
--- WoW Addon "KeyAnouncer"
+--[[
+    WoW Addon "KeyAnouncer"
+    Send your mythic+ keystone automaticly in guild or party chat.
+    
+    
+    TODOs: 
+    - partymember keys in sepperate window
 
--- TODO: 
--- - show partymember keys in sepperate window
+]]
+
 
 local addonName, addonTable = ...
 local KeyAnouncer = CreateFrame("Frame")
@@ -17,10 +23,7 @@ local isGuidChatEnabled = true
 local showOnLogin = false
 local addonVersion = "1.2.3"
 local postCooldown = 8
-
 local lastPostTime = 0
-local canPostKey = true
-
 local windowHeight = 250
 local windowWidth = 250
 local minimapButtonPosition = 0
@@ -94,7 +97,7 @@ infoText:SetText(informationText)
 -- Checkbox: Enable Addon
 local checkbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
 checkbox.text = checkbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-checkbox.text:SetPoint("LEFT", checkbox, "RIGHT", 2, 0) -- Reduzierter Abstand
+checkbox.text:SetPoint("LEFT", checkbox, "RIGHT", 2, 0)
 checkbox.text:SetText("Post Keystone Automatic")
 checkbox:SetChecked(KeyAnouncerDB.isEnabled)  -- Use the saved setting from KeyAnouncerDB
 checkbox:SetPoint("CENTER", frame, "CENTER", -(checkbox:GetWidth()*2 + 12), 15)
@@ -106,9 +109,9 @@ end)
 
 -- Checkbox: Show on Login
 local loginCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
-loginCheckbox:SetPoint("CENTER", checkbox, "BOTTOM", 0, -10) -- Platzierung direkt unter der ersten Checkbox
+loginCheckbox:SetPoint("CENTER", checkbox, "BOTTOM", 0, -10)
 loginCheckbox.text = loginCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-loginCheckbox.text:SetPoint("LEFT", loginCheckbox, "RIGHT", 2, 0) -- Reduzierter Abstand
+loginCheckbox.text:SetPoint("LEFT", loginCheckbox, "RIGHT", 2, 0)
 loginCheckbox.text:SetText("Show Settings on Login")
 loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Use the saved setting from KeyAnouncerDB
 loginCheckbox:SetScript("OnClick", function(self)
@@ -121,7 +124,7 @@ end)
 local partyChatCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
 partyChatCheckbox:SetPoint("CENTER", loginCheckbox, "BOTTOM", 0, -10) 
 partyChatCheckbox.text = partyChatCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-partyChatCheckbox.text:SetPoint("LEFT", partyChatCheckbox, "RIGHT", 2, 0) -- Reduzierter Abstand
+partyChatCheckbox.text:SetPoint("LEFT", partyChatCheckbox, "RIGHT", 2, 0)
 partyChatCheckbox.text:SetText("Include Partychat")
 partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)  -- Use the saved setting from KeyAnouncerDB
 partyChatCheckbox:SetScript("OnClick", function(self)
@@ -134,7 +137,7 @@ end)
 local guildChatCheckbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
 guildChatCheckbox:SetPoint("CENTER", partyChatCheckbox, "BOTTOM", 0, -10) 
 guildChatCheckbox.text = guildChatCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-guildChatCheckbox.text:SetPoint("LEFT", guildChatCheckbox, "RIGHT", 2, 0) -- Reduzierter Abstand
+guildChatCheckbox.text:SetPoint("LEFT", guildChatCheckbox, "RIGHT", 2, 0)
 guildChatCheckbox.text:SetText("Include Guildchat")
 guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuidChatEnabled)  -- Use the saved setting from KeyAnouncerDB
 guildChatCheckbox:SetScript("OnClick", function(self)
@@ -160,14 +163,8 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" or event == "PLAYER_ENTERING_WORLD" then
         local addonName = ...
         if addonName == addonName then
+            -- load savedvariables on addon load
             KeyAnouncerDB.MinimapIcon = KeyAnouncerDB.MinimapIcon or {hide = false}
-
-            if KeyAnouncerDB.MinimapIcon.hide then
-                LDBIcon:Hide("KeyAnouncer")
-            else
-                LDBIcon:Show("KeyAnouncer")
-            end
-            -- Lade Einstellungen, wenn das Addon geladen wurde
             isEnabled = KeyAnouncerDB.isEnabled ~= nil and KeyAnouncerDB.isEnabled or true
             showOnLogin = KeyAnouncerDB.showOnLogin ~= nil and KeyAnouncerDB.showOnLogin or true
             isPartyChatEnabled = KeyAnouncerDB.isPartyChatEnabled ~= nil and KeyAnouncerDB.isPartyChatEnabled or true
@@ -177,7 +174,11 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
             loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Lade Einstellung
             partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)
             guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuidChatEnabled)
-            -- UpdateMinimapButtonPosition()
+            if KeyAnouncerDB.MinimapIcon.hide then
+                LDBIcon:Hide("KeyAnouncer")
+            else
+                LDBIcon:Show("KeyAnouncer")
+            end
             if KeyAnouncerDB.showOnLogin == true then
                 frame:Show()
             else
@@ -185,14 +186,14 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
             end
         end
     elseif event == "PLAYER_LOGOUT" then
-        -- Speichern der Einstellungen
+        -- save settings
         KeyAnouncerDB.isEnabled = isEnabled
         KeyAnouncerDB.showOnLogin = showOnLogin
         KeyAnouncerDB.isPartyChatEnabled = isPartyChatEnabled
         KeyAnouncerDB.minimapButtonPosition = minimapButtonPosition
         KeyAnouncerDB.isGuidChatEnabled = isGuidChatEnabled
     elseif event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_GUILD" then
-        -- Chat-Nachricht verarbeiten
+        -- post keystone 
         local message, sender = ...
         if not isEnabled then
             return
@@ -200,7 +201,7 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
         if message == "!keys" then
             local now = GetTimeNow()
             if now - lastPostTime < postCooldown then
-                local remaining = postCooldown - (now - lastPostTime)
+                -- local remaining = postCooldown - (now - lastPostTime)
                 return
             end
             keystone = GetMythicKeystone()
