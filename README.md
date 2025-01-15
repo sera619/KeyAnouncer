@@ -68,3 +68,8 @@ Version 1.2.3 - Improved Usability
 Version 1.2.4 - Bugfix
 
 - fixing bug where settingswindow still showing if you log into a other character
+
+Version 1.2.5 - Improved Usability
+
+- fixing some typos
+- add addon icon in addonlist
