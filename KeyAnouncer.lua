@@ -22,6 +22,7 @@ local lastPostTime = 0
 local windowHeight = 250
 local windowWidth = 250
 local keystone = nil
+local acceptedKeystoneID = 180653
 
 -- function to get actual time 
 local function GetTimeNow()
@@ -57,7 +58,7 @@ local function GetMythicKeystone()
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
             local item = C_Container.GetContainerItemInfo(bag, slot)
             if item then
-                if item and (item.itemName:find("Keystone") or item.itemName:find("Schlüsselstein")) then
+                if item.itemID == acceptedKeystoneID then
                     -- print(item.hyperlink)
                     return item
                 end
