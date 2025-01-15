@@ -87,3 +87,4 @@ Version 1.2.7 - Improved Usability
 
 Version 1.2.6 - Hotfix
 - fixed missspelled variablename
+- setup get dynamic keystone ID
