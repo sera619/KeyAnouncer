@@ -19,15 +19,12 @@ local informationText = "Automatically link your M+ keystone in the group/guild 
 local addonVersion = C_AddOns.GetAddOnMetadata(addonName, "Version")
 local postCooldown = 8
 local lastPostTime = 0
-local windowHeight = 250
+local windowHeight = 275
 local windowWidth = 250
 local keystone = nil
 local acceptedKeystoneID = 180653
+local groupKeystones = {}
 
--- function to get actual time 
-local function GetTimeNow()
-    return time()
-end
 
 -- settings
 local defaultSettings = {
@@ -35,8 +32,15 @@ local defaultSettings = {
     showOnLogin = true,
     isGuildChatEnabled = true,
     isPartyChatEnabled = true,
-    MinimapIcon = {hide = false }
+    MinimapIcon = {hide = false },
+    framePosition = nil,
+    groupKeystonesFramePosition = nil,
 }
+
+-- function to get actual time 
+local function GetTimeNow()
+    return time()
+end
 
 local function SaveSettings()
     for key in pairs(defaultSettings) do
@@ -49,6 +53,20 @@ local function LoadSettings()
         if KeyAnouncerDB[key] == nil then
             KeyAnouncerDB[key] = value
         end
+    end
+end
+
+local function SaveFramePosition(frame, positionKey)
+    local point, _, relativePoint, xOffset, yOffset = frame:GetPoint()
+    KeyAnouncerDB[positionKey] = {point = point, relativePoint =  relativePoint, xOffset = xOffset, yOffset = yOffset}
+end
+
+local function LoadFramePosition(frame, positionKey, defaultPoint)
+    local position = KeyAnouncerDB[positionKey]
+    if position then
+        frame:SetPoint(position.point, UIParent, position.relativePoint, position.xOffset, position.yOffset)
+    else
+        frame:SetPoint(unpack(defaultPoint))
     end
 end
 
@@ -69,11 +87,91 @@ local function GetMythicKeystone()
     return ""
 end
 
+-- function to send key via addon
+local function AnnounceMyKey()
+    local key = GetMythicKeystone()
+    if key ~= "" then
+        C_ChatInfo.SendAddonMessage("KeyAnouncer", key.hyperlink, "PARTY")
+    end
+end
+
+
+
 -- Create Addon Window
 local frame = CreateFrame("Frame", "KeyAnouncerFrame", UIParent, "BasicFrameTemplateWithInset")
 frame:SetSize(windowWidth, windowHeight)
 frame:SetPoint("CENTER")
 frame:Hide()
+
+-- groupKeystones window
+local groupKeystonesFrame = CreateFrame("Frame", "KeyAnouncerPartyFrame", UIParent, "BasicFrameTemplateWithInset")
+groupKeystonesFrame:SetSize(450, 200)
+groupKeystonesFrame:SetPoint("TOP", 0, -10)
+groupKeystonesFrame:Hide()
+
+local groupKeystonesTitle = groupKeystonesFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMed2")
+groupKeystonesTitle:SetPoint("TOP", groupKeystonesFrame, "TOP", 0, -5)
+groupKeystonesTitle:SetText("KeyAnouncer - Groupkeys")
+groupKeystonesTitle:SetTextColor(255, 0, 0, 1)
+
+-- scroll frame for party window
+local partyScrollFrame = CreateFrame("ScrollFrame", nil, groupKeystonesFrame, "UIPanelScrollFrameTemplate")
+partyScrollFrame:SetPoint("TOPLEFT", 0, -30)
+partyScrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
+
+local partyFrameContent = CreateFrame("Frame", nil, partyScrollFrame)
+partyFrameContent:SetSize(450, 400)
+partyScrollFrame:SetScrollChild(partyFrameContent)
+
+-- key text
+local keyText = partyFrameContent:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+keyText:SetWidth(450)
+keyText:SetPoint("TOPLEFT", 0, 0)
+keyText:SetWordWrap(true)
+keyText:SetText("No keys available yet.")
+
+local function UpdateGroupFrame()
+    local displayText = ""
+
+    for player, key in pairs(groupKeystones) do
+        if key then
+            displayText = displayText .. player .. ": " .. key .. "\n"
+        else
+            displayText = displayText .. player .. ": No Keystone\n"
+        end
+    end
+    keyText:SetText(displayText ~= "" and displayText or "No keys available yet.")
+end
+
+local function UpdateOwnKeystone()
+    local name = UnitName('player')
+    local realm = GetRealmName()
+    local fullName = name .. "-" .. realm
+    local key = GetMythicKeystone()
+    if key ~= "" then
+        groupKeystones[fullName] = key.hyperlink
+    else
+        groupKeystones[fullName] = "No Keystone"
+    end
+end
+
+local function UpdateGroupMembers()
+    table.wipe(groupKeystones)
+    local numGroupMembers = GetNumGroupMembers()
+    for i = 1, numGroupMembers do
+        local name, realm = UnitName("party"..i)
+        if name then
+            local fullName = realm and (name.. "-" ..realm) or name
+            groupKeystones[fullName] = nil
+        end
+    end
+    print("Groupmembers: ".. numGroupMembers)
+    if numGroupMembers < 1 then
+        UpdateOwnKeystone()
+    end
+    UpdateGroupFrame()
+end
+
 
 -- create DataBroker object
 local dataObject = LDB:NewDataObject("KeyAnouncer",{
@@ -87,11 +185,19 @@ local dataObject = LDB:NewDataObject("KeyAnouncer",{
             else
                 frame:Show()
             end
+        elseif button == "RightButton" then
+            if groupKeystonesFrame:IsShown() then
+                groupKeystonesFrame:Hide()
+            else
+                groupKeystonesFrame:Show()
+            end
         end
     end,
     OnTooltipShow = function (tooltip)
         tooltip:AddLine("KeyAnouncer", 1, 1, 1)
+        tooltip:AddLine(" ", nil, nil, nil, true)
         tooltip:AddLine("Left-click to show/hide the addon window.", nil, nil, nil, true)
+        tooltip:AddLine("Right-click to show/hide groupkeystones window.", nil, nil, nil, true)
     end
 })
 
@@ -114,10 +220,10 @@ infoText:SetText(informationText)
 
 -- Checkbox: Enable Addon
 local checkbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
+checkbox:SetPoint("CENTER", infoText, "CENTER", -(checkbox:GetWidth()*2 + 12), -40)
 checkbox.text = checkbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 checkbox.text:SetPoint("LEFT", checkbox, "RIGHT", 2, 0)
 checkbox.text:SetText("Post Keystone Automatic")
-checkbox:SetPoint("CENTER", frame, "CENTER", -(checkbox:GetWidth()*2 + 12), 15)
 checkbox:SetScript("OnClick", function(self)
     KeyAnouncerDB.isEnabled = self:GetChecked()  -- Save the updated setting
     -- print("Checkbox clicked, isEnabled set to: " .. tostring(isEnabled))
@@ -156,11 +262,24 @@ guildChatCheckbox:SetScript("OnClick", function(self)
     -- print("Login Checkbox clicked, showOnLogin set to: " .. tostring(showOnLogin))
 end)
 
+-- show/hide partyframe button
+local partyFrameButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
+partyFrameButton:SetPoint("CENTER", frame, "CENTER", 0, -100) 
+partyFrameButton:SetText("Partykeystones")
+partyFrameButton:SetScript("OnClick", function(self)
+    if groupKeystonesFrame:IsShown() then
+        groupKeystonesFrame:Hide()
+    else
+        groupKeystonesFrame:Show()
+    end
+end)
+
 -- Version Text
 local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 versionText:SetPoint("BOTTOM", frame, "BOTTOM", 0, 10)
 versionText:SetTextScale(0.8)
 versionText:SetText('v' .. addonVersion .. " © S3R43o3 2025")
+
 
 -- Register events
 KeyAnouncer:RegisterEvent("CHAT_MSG_PARTY")
@@ -169,15 +288,19 @@ KeyAnouncer:RegisterEvent("CHAT_MSG_GUILD")
 KeyAnouncer:RegisterEvent("ADDON_LOADED")
 KeyAnouncer:RegisterEvent("PLAYER_LOGOUT")
 KeyAnouncer:RegisterEvent("PLAYER_ENTERING_WORLD")
-KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
+KeyAnouncer:RegisterEvent("GROUP_ROSTER_UPDATE")
+KeyAnouncer:RegisterEvent("PLAYER_ENTERING_WORLD")
+KeyAnouncer:RegisterEvent("CHAT_MSG_ADDON")
+C_ChatInfo.RegisterAddonMessagePrefix("KeyAnouncer")
+KeyAnouncer:SetScript("OnEvent", function(self, event, prefix, message, channel, sender, ...)
     if event == "ADDON_LOADED" then
     -- or event == "PLAYER_ENTERING_WORLD"
         local addonName = ...
         if addonName == addonName then
             -- load savedvariables on addon load
             LoadSettings()
-            checkbox:SetChecked(KeyAnouncerDB.isEnabled)  -- Lade Einstellung
-            loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Lade Einstellung
+            checkbox:SetChecked(KeyAnouncerDB.isEnabled)
+            loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)
             partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)
             guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuildChatEnabled)
             if KeyAnouncerDB.MinimapIcon.hide then
@@ -194,9 +317,17 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
     elseif event == "PLAYER_LOGOUT" then
         -- save settings
         SaveSettings()
+
+    elseif event == "CHAT_MSG_ADDON" and prefix == "KeyAnouncer" then
+        local playerName = Ambiguate(sender, "short")
+        groupKeystones[playerName] = message
+        UpdateGroupFrame()
+    elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
+        UpdateGroupMembers()
+        AnnounceMyKey()
+        
     elseif event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_GUILD" then
         -- post keystone 
-        local message, sender = ...
         if not KeyAnouncerDB.isEnabled then
             return
         end
