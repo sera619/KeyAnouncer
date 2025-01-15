@@ -78,3 +78,8 @@ Version 1.2.5 - Improved Usability
 Version 1.2.6 - Bugfix
 
 - fixing bug where key is not postet if english client is active
+
+
+Version 1.2.7 - Improved Usability
+
+- change find keystone from itemname to itemID
