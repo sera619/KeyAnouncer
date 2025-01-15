@@ -15,8 +15,8 @@ KeyAnouncerDB = KeyAnouncerDB or {}
 local LDB = LibStub("LibDataBroker-1.1")
 local LDBIcon = LibStub("LibDBIcon-1.0")
 
-local informationText = "Automatic link your keystone in guild or party chat if '!keys' is typped in chat."
-local addonVersion = "1.2.4"
+local informationText = "Automatically link your M+ keystone in the group/guild chat when “!keys” is written in the chat."
+local addonVersion = C_AddOns.GetAddOnMetadata(addonName, "Version")
 local postCooldown = 8
 local lastPostTime = 0
 local windowHeight = 250
