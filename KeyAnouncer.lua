@@ -8,7 +8,6 @@
 
 ]]
 
-
 local addonName, addonTable = ...
 local KeyAnouncer = CreateFrame("Frame")
 KeyAnouncerDB = KeyAnouncerDB or {}
@@ -17,21 +16,39 @@ local LDB = LibStub("LibDataBroker-1.1")
 local LDBIcon = LibStub("LibDBIcon-1.0")
 
 local informationText = "Automatic link your keystone in guild or party chat if '!keys' is typped in chat."
-local isEnabled = true
-local isPartyChatEnabled = true
-local isGuidChatEnabled = true
-local showOnLogin = false
-local addonVersion = "1.2.3"
+local addonVersion = "1.2.4"
 local postCooldown = 8
 local lastPostTime = 0
 local windowHeight = 250
 local windowWidth = 250
-local minimapButtonPosition = 0
 local keystone = nil
 
 -- function to get actual time 
 local function GetTimeNow()
     return time()
+end
+
+-- settings
+local defaultSettings = {
+    isEnabled = true,
+    showOnLogin = true,
+    isGuildChatEnabled = true,
+    isPartyChatEnabled = true,
+    MinimapIcon = {hide = false }
+}
+
+local function SaveSettings()
+    for key in pairs(defaultSettings) do
+        KeyAnouncerDB[key] = KeyAnouncerDB[key]
+    end
+end
+
+local function LoadSettings()
+    for key, value in pairs(defaultSettings) do
+        if KeyAnouncerDB[key] == nil then
+            KeyAnouncerDB[key] = value
+        end
+    end
 end
 
 -- function to find and return players keystone
@@ -99,11 +116,9 @@ local checkbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
 checkbox.text = checkbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 checkbox.text:SetPoint("LEFT", checkbox, "RIGHT", 2, 0)
 checkbox.text:SetText("Post Keystone Automatic")
-checkbox:SetChecked(KeyAnouncerDB.isEnabled)  -- Use the saved setting from KeyAnouncerDB
 checkbox:SetPoint("CENTER", frame, "CENTER", -(checkbox:GetWidth()*2 + 12), 15)
 checkbox:SetScript("OnClick", function(self)
-    isEnabled = self:GetChecked()
-    KeyAnouncerDB.isEnabled = isEnabled  -- Save the updated setting
+    KeyAnouncerDB.isEnabled = self:GetChecked()  -- Save the updated setting
     -- print("Checkbox clicked, isEnabled set to: " .. tostring(isEnabled))
 end)
 
@@ -113,10 +128,8 @@ loginCheckbox:SetPoint("CENTER", checkbox, "BOTTOM", 0, -10)
 loginCheckbox.text = loginCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 loginCheckbox.text:SetPoint("LEFT", loginCheckbox, "RIGHT", 2, 0)
 loginCheckbox.text:SetText("Show Settings on Login")
-loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Use the saved setting from KeyAnouncerDB
 loginCheckbox:SetScript("OnClick", function(self)
-    showOnLogin = self:GetChecked()
-    KeyAnouncerDB.showOnLogin = showOnLogin  -- Save the updated setting
+    KeyAnouncerDB.showOnLogin = self:GetChecked()
     -- print("Login Checkbox clicked, showOnLogin set to: " .. tostring(showOnLogin))
 end)
 
@@ -126,10 +139,8 @@ partyChatCheckbox:SetPoint("CENTER", loginCheckbox, "BOTTOM", 0, -10)
 partyChatCheckbox.text = partyChatCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 partyChatCheckbox.text:SetPoint("LEFT", partyChatCheckbox, "RIGHT", 2, 0)
 partyChatCheckbox.text:SetText("Include Partychat")
-partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)  -- Use the saved setting from KeyAnouncerDB
 partyChatCheckbox:SetScript("OnClick", function(self)
-    isPartyChatEnabled = self:GetChecked()
-    KeyAnouncerDB.isPartyChatEnabled = isPartyChatEnabled  -- Save the updated setting
+    KeyAnouncerDB.isPartyChatEnabled = self:GetChecked()
     -- print("Login Checkbox clicked, showOnLogin set to: " .. tostring(showOnLogin))
 end)
 
@@ -139,10 +150,8 @@ guildChatCheckbox:SetPoint("CENTER", partyChatCheckbox, "BOTTOM", 0, -10)
 guildChatCheckbox.text = guildChatCheckbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 guildChatCheckbox.text:SetPoint("LEFT", guildChatCheckbox, "RIGHT", 2, 0)
 guildChatCheckbox.text:SetText("Include Guildchat")
-guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuidChatEnabled)  -- Use the saved setting from KeyAnouncerDB
 guildChatCheckbox:SetScript("OnClick", function(self)
-    isGuidChatEnabled = self:GetChecked()
-    KeyAnouncerDB.isPartyChatEnabled = isGuidChatEnabled  -- Save the updated setting
+    KeyAnouncerDB.isGuidChatEnabled = self:GetChecked()
     -- print("Login Checkbox clicked, showOnLogin set to: " .. tostring(showOnLogin))
 end)
 
@@ -160,16 +169,12 @@ KeyAnouncer:RegisterEvent("ADDON_LOADED")
 KeyAnouncer:RegisterEvent("PLAYER_LOGOUT")
 KeyAnouncer:RegisterEvent("PLAYER_ENTERING_WORLD")
 KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
-    if event == "ADDON_LOADED" or event == "PLAYER_ENTERING_WORLD" then
+    if event == "ADDON_LOADED" then
+    -- or event == "PLAYER_ENTERING_WORLD"
         local addonName = ...
         if addonName == addonName then
             -- load savedvariables on addon load
-            KeyAnouncerDB.MinimapIcon = KeyAnouncerDB.MinimapIcon or {hide = false}
-            isEnabled = KeyAnouncerDB.isEnabled ~= nil and KeyAnouncerDB.isEnabled or true
-            showOnLogin = KeyAnouncerDB.showOnLogin ~= nil and KeyAnouncerDB.showOnLogin or true
-            isPartyChatEnabled = KeyAnouncerDB.isPartyChatEnabled ~= nil and KeyAnouncerDB.isPartyChatEnabled or true
-            isGuidChatEnabled = KeyAnouncerDB.isGuidChatEnabled ~= nil and KeyAnouncerDB.isGuidChatEnabled or true
-            minimapButtonPosition = KeyAnouncerDB.minimapButtonPosition or 0
+            LoadSettings()
             checkbox:SetChecked(KeyAnouncerDB.isEnabled)  -- Lade Einstellung
             loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Lade Einstellung
             partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)
@@ -187,15 +192,11 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
         end
     elseif event == "PLAYER_LOGOUT" then
         -- save settings
-        KeyAnouncerDB.isEnabled = isEnabled
-        KeyAnouncerDB.showOnLogin = showOnLogin
-        KeyAnouncerDB.isPartyChatEnabled = isPartyChatEnabled
-        KeyAnouncerDB.minimapButtonPosition = minimapButtonPosition
-        KeyAnouncerDB.isGuidChatEnabled = isGuidChatEnabled
+        SaveSettings()
     elseif event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_GUILD" then
         -- post keystone 
         local message, sender = ...
-        if not isEnabled then
+        if not KeyAnouncerDB.isEnabled then
             return
         end
         if message == "!keys" then
@@ -207,12 +208,12 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
             keystone = GetMythicKeystone()
             if keystone ~= "" then
                 if event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" then
-                    if not isPartyChatEnabled then
+                    if not KeyAnouncerDB.isPartyChatEnabled then
                         return
                     end
                     SendChatMessage(keystone.hyperlink, "PARTY")
                 elseif event == "CHAT_MSG_GUILD" then
-                    if not isGuidChatEnabled then
+                    if not KeyAnouncerDB.isGuidChatEnabled then
                         return
                     end
                     SendChatMessage(keystone.hyperlink, "GUILD")
