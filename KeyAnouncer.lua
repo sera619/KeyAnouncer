@@ -152,7 +152,7 @@ guildChatCheckbox.text = guildChatCheckbox:CreateFontString(nil, "OVERLAY", "Gam
 guildChatCheckbox.text:SetPoint("LEFT", guildChatCheckbox, "RIGHT", 2, 0)
 guildChatCheckbox.text:SetText("Include Guildchat")
 guildChatCheckbox:SetScript("OnClick", function(self)
-    KeyAnouncerDB.isGuidChatEnabled = self:GetChecked()
+    KeyAnouncerDB.isGuildChatEnabled = self:GetChecked()
     -- print("Login Checkbox clicked, showOnLogin set to: " .. tostring(showOnLogin))
 end)
 
@@ -179,7 +179,7 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
             checkbox:SetChecked(KeyAnouncerDB.isEnabled)  -- Lade Einstellung
             loginCheckbox:SetChecked(KeyAnouncerDB.showOnLogin)  -- Lade Einstellung
             partyChatCheckbox:SetChecked(KeyAnouncerDB.isPartyChatEnabled)
-            guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuidChatEnabled)
+            guildChatCheckbox:SetChecked(KeyAnouncerDB.isGuildChatEnabled)
             if KeyAnouncerDB.MinimapIcon.hide then
                 LDBIcon:Hide("KeyAnouncer")
             else
@@ -214,7 +214,7 @@ KeyAnouncer:SetScript("OnEvent", function(self, event, ...)
                     end
                     SendChatMessage(keystone.hyperlink, "PARTY")
                 elseif event == "CHAT_MSG_GUILD" then
-                    if not KeyAnouncerDB.isGuidChatEnabled then
+                    if not KeyAnouncerDB.isGuildChatEnabled then
                         return
                     end
                     SendChatMessage(keystone.hyperlink, "GUILD")
