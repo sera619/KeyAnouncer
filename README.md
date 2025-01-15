@@ -73,3 +73,8 @@ Version 1.2.5 - Improved Usability
 
 - fixing some typos
 - add addon icon in addonlist
+
+
+Version 1.2.6 - Bugfix
+
+- fixing bug where key is not postet if english client is active
