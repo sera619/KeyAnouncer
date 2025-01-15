@@ -64,3 +64,7 @@ Version 1.2.3 - Improved Usability
 - setup a moveable minimap icon
 - add cooldown to prevent chatspam
 - code refactoring
+
+Version 1.2.4 - Bugfix
+
+- fixing bug where settingswindow still showing if you log into a other character
