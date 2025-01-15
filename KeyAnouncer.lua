@@ -57,7 +57,7 @@ local function GetMythicKeystone()
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
             local item = C_Container.GetContainerItemInfo(bag, slot)
             if item then
-                if item and (item.itemName:find("Mythic Keystone") or item.itemName:find("Schlüsselstein")) then
+                if item and (item.itemName:find("Keystone") or item.itemName:find("Schlüsselstein")) then
                     -- print(item.hyperlink)
                     return item
                 end
