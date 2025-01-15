@@ -7,7 +7,7 @@ destination_folder = os.path.join("dist", "KeyAnouncer")
 def deploy(version):
     clean_up()
     print("Deploy addon in 'dist' folder...")
-    zip_file = os.path.join("dist", "KeyAnouncer-"+version+".zip")
+    zip_file = os.path.join("dist", "KeyAnnouncer-"+version+".zip")
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
     
