@@ -83,3 +83,7 @@ Version 1.2.6 - Bugfix
 Version 1.2.7 - Improved Usability
 
 - change find keystone from itemname to itemID
+
+
+Version 1.2.6 - Hotfix
+- fixed missspelled variablename
