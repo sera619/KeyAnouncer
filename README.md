@@ -1,7 +1,7 @@
 # KeyAnouncer - WoW Addon
 
 ## Description:
-Keystone Tracker is a simple yet effective addon for World of Warcraft that allows players to share and view Mythic+ keystones within their party. By leveraging the game's addon communication system, Keystone Tracker makes it easy for party members to know who has which keystone, helping the group coordinate Mythic+ runs more effectively.
+KeyAnouncer is a simple yet effective addon for World of Warcraft that allows players to share and view Mythic+ keystones within their party. By leveraging the game's addon communication system, Keystone Tracker makes it easy for party members to know who has which keystone, helping the group coordinate Mythic+ runs more effectively.
 
 ## Features:
 - Automatic Keystone Detection: The addon automatically scans the player's inventory for their Mythic+ keystone.
@@ -32,59 +32,46 @@ Compatible with World of Warcraft's latest expansion and patch.
 ## Changelog
 
 Version 1.0.0 - Initial Release
-
 - Added functionality to automatically detect the player's Mythic+ keystone from their inventory.
 - Implemented an addon communication system to share keystone information with other party members.
 - Displayed keystone details of party members in the chat window.
 - Registered the addon with the MyKeystoneAddon communication prefix.
 
-
 Version 1.1.0- Improved Usability
-
 - Enhanced compatibility with different inventory setups to ensure keystone detection works seamlessly.
 - Improved chat output formatting for better readability of shared keystone information.
 - Added error handling for scenarios where no keystone is found.
 
-
 Version 1.1.1- New Features and Fixes
-
 - Fixed a bug where keystone data was not sent to the party after reloading the UI.
 
-
 Version 1.1.2 - Optimization
-
 - Minor fixes to improve stability and compatibility with the latest WoW patch.
   
 Version 1.1.4 - Bugfix
-
 - set correct current wow interfacenumber
 
 Version 1.2.3 - Improved Usability
-
 - setup a moveable minimap icon
 - add cooldown to prevent chatspam
 - code refactoring
 
 Version 1.2.4 - Bugfix
-
 - fixing bug where settingswindow still showing if you log into a other character
 
 Version 1.2.5 - Improved Usability
-
 - fixing some typos
 - add addon icon in addonlist
 
-
 Version 1.2.6 - Bugfix
-
 - fixing bug where key is not postet if english client is active
 
-
 Version 1.2.7 - Improved Usability
-
 - change find keystone from itemname to itemID
 
-
-Version 1.2.6 - Hotfix
+Version 1.2.8 - Hotfix
 - fixed missspelled variablename
 - setup get dynamic keystone ID
+
+Version 1.3.0 - Improved Usability
+- add a partyframe to display all keys in group
