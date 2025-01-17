@@ -7,4 +7,6 @@
 ## IconTexture: Interface/AddOns/KeyAnnouncer/Icons/KeyAnnouncerIcon.tga
 
 # Addon Files
+Utils.lua
 KeyAnnouncer.lua
+
