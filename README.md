@@ -87,4 +87,5 @@ Version 1.3.2 - Bugfix
 Version 1.3.3 - Improved Usability
 - refactoring code to make sure event vars are valid and accessable
 - create utils file for utilfunctions
-- add a active-status message on minimap tooltip 
+- add a active-status message on minimap tooltip
+- fix an issue where minimapbutton position is not restored correctly after relog
