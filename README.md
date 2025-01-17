@@ -89,3 +89,6 @@ Version 1.3.3 - Improved Usability
 - create utils file for utilfunctions
 - add a active-status message on minimap tooltip
 - fix an issue where minimapbutton position is not restored correctly after relog
+
+Version 1.3.4 - Bugfix
+- fix missing utils file in .toc
