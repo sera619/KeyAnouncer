@@ -2,20 +2,17 @@
     WoW Addon "KeyAnnouncer"
     Send your mythic+ keystone automaticly in guild or party chat.
     
-    
     TODOs: 
-    - partymember keys in sepperate window
-
+    
 ]]
 
-local addonName = "KeyAnnouncer"
+local addonName, addonTable  = ...
 local KeyAnnouncer = CreateFrame("Frame")
 KeyAnnouncerDB = KeyAnnouncerDB or {}
 -- load libs
 local LDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", true)
 local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
 
-local informationText = "Automatically link your M+ keystone in the group/guild chat when “!keys” is written in the chat."
 local addonVersion = C_AddOns.GetAddOnMetadata(addonName, "Version")
 local postCooldown = 8
 local lastPostTime = 0
@@ -24,8 +21,11 @@ local windowWidth = 250
 local acceptedKeystoneID = 180653
 local groupKeystones = {}
 local keystone = nil
-
--- settings
+local KeyAnnouncerTextDB = {
+    AddonEnabled = KeyAnnouncerUtils.PrintGreen("Addon is enabled"),
+    AddonDisabled = KeyAnnouncerUtils.PrintRed("Addon is disabled"),
+    InformationText = "Automatically link your M+ keystone in the group/guild chat when “!keys” is written in the chat."
+}
 local defaultSettings = {
     isEnabled = true,
     showOnLogin = true,
@@ -39,6 +39,10 @@ local defaultSettings = {
 -- function to get actual time 
 local function GetTimeNow()
     return time()
+end
+
+local function PrintAddonCyan(text)
+    return "|cff00fcfc"..text..":|r "
 end
 
 local function SaveSettings()
@@ -145,7 +149,6 @@ keyText:SetText("No keys available yet.")
 
 local function UpdateGroupFrame()
     local displayText = ""
-
     for player, key in pairs(groupKeystones) do
         if key then
             displayText = displayText .. player .. ": " .. key .. "\n"
@@ -185,7 +188,6 @@ local function UpdateGroupMembers()
     UpdateGroupFrame()
 end
 
-
 -- create DataBroker object
 local dataObject = LDB:NewDataObject("KeyAnnouncer",{
     type = "launcher",
@@ -208,15 +210,15 @@ local dataObject = LDB:NewDataObject("KeyAnnouncer",{
     end,
     OnTooltipShow = function (tooltip)
         tooltip:AddLine("KeyAnnouncer", 1, 1, 1)
-        tooltip:AddLine(" ", nil, nil, nil, true)
+        if KeyAnnouncerDB.isEnabled then
+            tooltip:AddLine(KeyAnnouncerTextDB.AddonEnabled, nil, nil, nil, true)
+        else
+            tooltip:AddLine(KeyAnnouncerTextDB.AddonDisabled, nil, nil, nil, true)
+        end
         tooltip:AddLine("Left-click to show/hide the addon window.", nil, nil, nil, true)
         tooltip:AddLine("Right-click to show/hide groupkeystones window.", nil, nil, nil, true)
     end
 })
-LDBIcon:Register("KeyAnnouncer", dataObject, KeyAnnouncerDB.MinimapIcon)
-
-
-
 
 -- Title
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMed2")
@@ -230,7 +232,7 @@ infoText:SetPoint("TOP", title, "TOP", 0, -30)
 infoText:SetWidth(windowWidth-20)
 infoText:SetWordWrap(true)
 infoText:SetTextColor(255,255,255,1)
-infoText:SetText(informationText)
+infoText:SetText(KeyAnnouncerTextDB.InformationText)
 
 -- Checkbox: Enable Addon
 local checkbox = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
@@ -294,6 +296,55 @@ versionText:SetPoint("BOTTOM", frame, "BOTTOM", 0, 10)
 versionText:SetTextScale(0.8)
 versionText:SetText('v' .. addonVersion .. " © S3R43o3 2025")
 
+-- function to send keystones in chat 
+local function SendKeystoneInChat(event)
+    local now = GetTimeNow()
+    if now - lastPostTime < postCooldown then
+        -- local remaining = postCooldown - (now - lastPostTime)
+        return
+    end
+    keystone = GetMythicKeystone()
+    if keystone and keystone ~= "" then
+        if event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" then
+            if not KeyAnnouncerDB.isPartyChatEnabled then
+                return
+            end
+            SendChatMessage(keystone.hyperlink, "PARTY")
+        elseif event == "CHAT_MSG_GUILD" then
+            if not KeyAnnouncerDB.isGuildChatEnabled then
+                return
+            end
+            SendChatMessage(keystone.hyperlink, "GUILD")
+        end
+        lastPostTime = now
+    else
+        -- print("No keystone found!")
+        return
+    end
+end
+
+-- function to initialize addon
+local function InitializeAddon()
+    LoadSettings()
+    -- Register minimapicon
+    LDBIcon:Register("KeyAnnouncer", dataObject, KeyAnnouncerDB.MinimapIcon)
+    LoadFramePosition(frame, "framePosition", {"CENTER", 0, 0})
+    LoadFramePosition(groupKeystonesFrame, "groupKeystonesFramePosition", {"TOP", 0, -10})
+    checkbox:SetChecked(KeyAnnouncerDB.isEnabled)
+    loginCheckbox:SetChecked(KeyAnnouncerDB.showOnLogin)
+    partyChatCheckbox:SetChecked(KeyAnnouncerDB.isPartyChatEnabled)
+    guildChatCheckbox:SetChecked(KeyAnnouncerDB.isGuildChatEnabled)
+    if KeyAnnouncerDB.MinimapIcon.hide then
+        LDBIcon:Hide("KeyAnnouncer")
+    else
+        LDBIcon:Show("KeyAnnouncer")
+    end
+    if KeyAnnouncerDB.showOnLogin == true then
+        frame:Show()
+    else
+        frame:Hide()
+    end
+end
 
 -- Register events
 KeyAnnouncer:RegisterEvent("CHAT_MSG_PARTY")
@@ -306,71 +357,35 @@ KeyAnnouncer:RegisterEvent("GROUP_ROSTER_UPDATE")
 KeyAnnouncer:RegisterEvent("PLAYER_ENTERING_WORLD")
 KeyAnnouncer:RegisterEvent("CHAT_MSG_ADDON")
 C_ChatInfo.RegisterAddonMessagePrefix("KeyAnnouncer")
-KeyAnnouncer:SetScript("OnEvent", function(self, event, prefix, message, channel, sender, ...)
+KeyAnnouncer:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
-    -- or event == "PLAYER_ENTERING_WORLD"
-        local addonName = ...
-        if addonName == addonName then
-            -- load savedvariables on addon load
-            LoadSettings()
-            -- Register minimapicon
-            LoadFramePosition(frame, "framePosition", {"CENTER", 0, 0})
-            LoadFramePosition(groupKeystonesFrame, "groupKeystonesFramePosition", {"TOP", 0, -10})
-            checkbox:SetChecked(KeyAnnouncerDB.isEnabled)
-            loginCheckbox:SetChecked(KeyAnnouncerDB.showOnLogin)
-            partyChatCheckbox:SetChecked(KeyAnnouncerDB.isPartyChatEnabled)
-            guildChatCheckbox:SetChecked(KeyAnnouncerDB.isGuildChatEnabled)
-            if KeyAnnouncerDB.MinimapIcon.hide then
-                LDBIcon:Hide("KeyAnnouncer")
-            else
-                LDBIcon:Show("KeyAnnouncer")
-            end
-            if KeyAnnouncerDB.showOnLogin == true then
-                frame:Show()
-            else
-                frame:Hide()
-            end
+        -- args: addonName
+        local aName = ...
+        if aName == addonName then
+            InitializeAddon()
+            print(PrintAddonCyan(aName).."Addon version "..addonVersion.." loaded successfully.")
         end
     elseif event == "PLAYER_LOGOUT" then
-        -- save settings
         SaveSettings()
-
-    elseif event == "CHAT_MSG_ADDON" and prefix == "KeyAnnouncer" then
-        local playerName = Ambiguate(sender, "short")
-        groupKeystones[playerName] = message
-        UpdateGroupFrame()
+    elseif event == "CHAT_MSG_ADDON" then
+        -- args: prefix, message, channel, sender        
+        local prefix, message, channel, sender = ...
+        if prefix == "KeyAnnouncer" then
+            local playerName = Ambiguate(sender, "short")
+            groupKeystones[playerName] = message
+            UpdateGroupFrame()
+        end
     elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
         UpdateGroupMembers()
         AnnounceMyKey()
     elseif event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_GUILD" then
-        -- post keystone 
-        local now = GetTimeNow()
+        -- args: message, author, language, chatLineID, sender 
+        local message, author, language, chatLineID, sender = ...
         if not KeyAnnouncerDB.isEnabled then
             return
         end
-        if message == "!keys" or prefix == "!keys" then
-            keystone = GetMythicKeystone()
-            if now - lastPostTime < postCooldown then
-                -- local remaining = postCooldown - (now - lastPostTime)
-                return
-            end
-            if keystone and keystone ~= "" then
-                if event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" then
-                    if not KeyAnnouncerDB.isPartyChatEnabled then
-                        return
-                    end
-                    SendChatMessage(keystone.hyperlink, "PARTY")
-                elseif event == "CHAT_MSG_GUILD" then
-                    if not KeyAnnouncerDB.isGuildChatEnabled then
-                        return
-                    end
-                    SendChatMessage(keystone.hyperlink, "GUILD")
-                end
-                lastPostTime = now
-            else
-                -- print("No keystone found!")
-                return
-            end
+        if message == "!keys" then
+            SendKeystoneInChat(event)
         end
     end
 end)
