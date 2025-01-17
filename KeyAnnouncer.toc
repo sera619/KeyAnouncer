@@ -1,6 +1,6 @@
 ## Interface: 110007
-## Title: |cff00fcfcKeyAnnouncer|r 1.3.1
-## Version: 1.3.1
+## Title: |cff00fcfcKeyAnnouncer|r 1.3.2
+## Version: 1.3.2
 ## Author: S3R43o3
 ## Notes: An addon to announce your keystone in chat
 ## SavedVariables: KeyAnnouncerDB
