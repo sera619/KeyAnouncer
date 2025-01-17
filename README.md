@@ -22,12 +22,12 @@ Compatible with World of Warcraft's latest expansion and patch.
 ## Screenshots
 > Settingsframe
 > 
-> ![KeyAnouncer Settingswindow](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnouncer_UI.png?raw=true)
+> ![KeyAnouncer Settingswindow](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnnouncer_UI.png?raw=true)
 
 
 > Chatwindow
 >
-> ![KeyAnouncer Chat](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnouncer_Chat.png?raw=true)
+> ![KeyAnouncer Chat](https://github.com/sera619/KeyAnouncer/blob/main/Icons/KeyAnnouncer_Chat.png?raw=true)
 
 ## Changelog
 
@@ -77,4 +77,5 @@ Version 1.3.0 - Improved Usability
 - add a partyframe to display all keys in group (beta)
 - fix misspells
 - make UI Frames moveable
+- adding libs in .toc
   
