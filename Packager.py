@@ -1,6 +1,6 @@
 import os, shutil, zipfile
 
-source_files = ["KeyAnnouncer.lua", "KeyAnnouncer.toc", "README.md"]
+source_files = ["KeyAnnouncer.lua", "Utils.lua","KeyAnnouncer.toc", "README.md"]
 source_dirs = ["Icons", "Libs"]
 destination_folder = os.path.join("dist", "KeyAnnouncer")
 
