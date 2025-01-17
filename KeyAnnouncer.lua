@@ -12,8 +12,8 @@ local addonName, addonTable = ...
 local KeyAnnouncer = CreateFrame("Frame")
 KeyAnnouncerDB = KeyAnnouncerDB or {}
 -- load libs
-local LDB = LibStub("LibDataBroker-1.1")
-local LDBIcon = LibStub("LibDBIcon-1.0")
+local LDBIcon = LibStub:GetLibrary("LibDBIcon-1.0", true)
+local LDB = LibStub:GetLibrary("LibDataBroker-1.1", true)
 
 local informationText = "Automatically link your M+ keystone in the group/guild chat when “!keys” is written in the chat."
 local addonVersion = C_AddOns.GetAddOnMetadata(addonName, "Version")
@@ -32,7 +32,7 @@ local defaultSettings = {
     showOnLogin = true,
     isGuildChatEnabled = true,
     isPartyChatEnabled = true,
-    MinimapIcon = {hide = false },
+    MinimapIcon = {hide = false, minimapPos = 220 },
     framePosition = nil,
     groupKeystonesFramePosition = nil,
 }
@@ -102,7 +102,8 @@ frame:SetPoint("CENTER")
 frame:SetMovable(true)
 frame:EnableMouse(true)
 frame:RegisterForDrag("LeftButton")
-frame:SetScript("OnDragStart", function(self)
+frame:SetScript("OnDragStart", frame.StartMoving)
+frame:SetScript("OnDragStop", function(self)
     self:StopMovingOrSizing()
     SaveFramePosition(self, "framePosition")
 end)
@@ -114,7 +115,9 @@ groupKeystonesFrame:SetSize(450, 200)
 groupKeystonesFrame:SetPoint("TOP", 0, -10)
 groupKeystonesFrame:SetMovable(true)
 groupKeystonesFrame:EnableMouse(true)
-groupKeystonesFrame:RegisterForDrag("LeftButton", function (self)
+groupKeystonesFrame:RegisterForDrag("LeftButton")
+groupKeystonesFrame:SetScript("OnDragStart", groupKeystonesFrame.StartMoving)
+groupKeystonesFrame:SetScript("OnDragStop", function (self)
     self:StopMovingOrSizing()
     SaveFramePosition(self, "groupKeystonesFramePosition")
 end)
@@ -211,9 +214,10 @@ local dataObject = LDB:NewDataObject("KeyAnnouncer",{
         tooltip:AddLine("Right-click to show/hide groupkeystones window.", nil, nil, nil, true)
     end
 })
-
--- Register minimapicon
 LDBIcon:Register("KeyAnnouncer", dataObject, KeyAnnouncerDB.MinimapIcon)
+
+
+
 
 -- Title
 local title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMed2")
@@ -310,6 +314,7 @@ KeyAnnouncer:SetScript("OnEvent", function(self, event, prefix, message, channel
         if addonName == addonName then
             -- load savedvariables on addon load
             LoadSettings()
+            -- Register minimapicon
             LoadFramePosition(frame, "framePosition", {"CENTER", 0, 0})
             LoadFramePosition(groupKeystonesFrame, "groupKeystonesFramePosition", {"TOP", 0, -10})
             checkbox:SetChecked(KeyAnnouncerDB.isEnabled)
