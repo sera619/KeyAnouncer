@@ -31,7 +31,7 @@ local defaultSettings = {
     showOnLogin = true,
     isGuildChatEnabled = true,
     isPartyChatEnabled = true,
-    MinimapIcon = {hide = false, minimapPos = 220 },
+    MinimapIcon = {hide = false, minimapPos = 120 },
     framePosition = nil,
     groupKeystonesFramePosition = nil,
 }
@@ -349,11 +349,9 @@ KeyAnnouncer:SetScript("OnEvent", function(self, event, prefix, message, channel
             return
         end
         if message == "!keys" or prefix == "!keys" then
-            print("Get time")
             keystone = GetMythicKeystone()
             if now - lastPostTime < postCooldown then
                 -- local remaining = postCooldown - (now - lastPostTime)
-                print("Cooldown active")
                 return
             end
             if keystone and keystone ~= "" then

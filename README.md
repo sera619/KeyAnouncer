@@ -80,3 +80,6 @@ Version 1.3.0 - Improved Usability
 
 Version 1.3.1 - Bugfix
 - fix not post key after update
+
+Version 1.3.2 - Bugfix
+- disable dev outputs
