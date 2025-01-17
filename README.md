@@ -92,3 +92,8 @@ Version 1.3.3 - Improved Usability
 
 Version 1.3.4 - Bugfix
 - fix missing utils file in .toc
+
+Version 1.3.8 - Improved Usability
+- add changelog frame
+- add button to show/hide changelog frame
+- add changelogDB
