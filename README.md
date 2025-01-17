@@ -83,3 +83,8 @@ Version 1.3.1 - Bugfix
 
 Version 1.3.2 - Bugfix
 - disable dev outputs
+
+Version 1.3.3 - Improved Usability
+- refactoring code to make sure event vars are valid and accessable
+- create utils file for utilfunctions
+- add a active-status message on minimap tooltip 
