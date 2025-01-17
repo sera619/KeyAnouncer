@@ -1,8 +1,8 @@
 import os, shutil, zipfile
 
-source_files = ["KeyAnouncer.lua", "KeyAnouncer.toc", "README.md"]
+source_files = ["KeyAnnouncer.lua", "KeyAnnouncer.toc", "README.md"]
 source_dirs = ["Icons", "Libs"]
-destination_folder = os.path.join("dist", "KeyAnouncer")
+destination_folder = os.path.join("dist", "KeyAnnouncer")
 
 def deploy(version):
     clean_up()
@@ -46,7 +46,7 @@ def clean_up(dist_folder = "dist"):
 
 def main():
     options = ["1) Deploy", "2) Clean up", "0) Exit"]
-    print("KeyAnouncer Packager\n")
+    print("KeyAnnouncer Packager\n")
     for o in options:
         print(o)
     choose = input("Select a option (1-0): ")

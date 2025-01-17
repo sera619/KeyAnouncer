@@ -1,7 +1,7 @@
-# KeyAnouncer - WoW Addon
+# KeyAnnouncer - WoW Addon
 
 ## Description:
-KeyAnouncer is a simple yet effective addon for World of Warcraft that allows players to share and view Mythic+ keystones within their party. By leveraging the game's addon communication system, Keystone Tracker makes it easy for party members to know who has which keystone, helping the group coordinate Mythic+ runs more effectively.
+KeyAnnouncer is a simple yet effective addon for World of Warcraft that allows players to share and view Mythic+ keystones within their party. By leveraging the game's addon communication system, KeyAnnouncer makes it easy for party members to know who has which keystone, helping the group coordinate Mythic+ runs more effectively.
 
 ## Features:
 - Automatic Keystone Detection: The addon automatically scans the player's inventory for their Mythic+ keystone.
@@ -74,4 +74,7 @@ Version 1.2.8 - Hotfix
 - setup get dynamic keystone ID
 
 Version 1.3.0 - Improved Usability
-- add a partyframe to display all keys in group
+- add a partyframe to display all keys in group (beta)
+- fix misspells
+- make UI Frames moveable
+  
