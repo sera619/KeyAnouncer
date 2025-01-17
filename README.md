@@ -78,4 +78,5 @@ Version 1.3.0 - Improved Usability
 - fix misspells
 - make UI Frames moveable
 
-  
+Version 1.3.1 - Bugfix
+- fix not post key after update

@@ -8,7 +8,7 @@
 
 ]]
 
-local addonName, addonTable = ...
+local addonName = "KeyAnnouncer"
 local KeyAnnouncer = CreateFrame("Frame")
 KeyAnnouncerDB = KeyAnnouncerDB or {}
 -- load libs
@@ -21,10 +21,9 @@ local postCooldown = 8
 local lastPostTime = 0
 local windowHeight = 275
 local windowWidth = 250
-local keystone = nil
 local acceptedKeystoneID = 180653
 local groupKeystones = {}
-
+local keystone = nil
 
 -- settings
 local defaultSettings = {
@@ -343,20 +342,21 @@ KeyAnnouncer:SetScript("OnEvent", function(self, event, prefix, message, channel
     elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
         UpdateGroupMembers()
         AnnounceMyKey()
-        
     elseif event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_GUILD" then
         -- post keystone 
+        local now = GetTimeNow()
         if not KeyAnnouncerDB.isEnabled then
             return
         end
-        if message == "!keys" then
-            local now = GetTimeNow()
+        if message == "!keys" or prefix == "!keys" then
+            print("Get time")
+            keystone = GetMythicKeystone()
             if now - lastPostTime < postCooldown then
                 -- local remaining = postCooldown - (now - lastPostTime)
+                print("Cooldown active")
                 return
             end
-            keystone = GetMythicKeystone()
-            if keystone ~= "" then
+            if keystone and keystone ~= "" then
                 if event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER" then
                     if not KeyAnnouncerDB.isPartyChatEnabled then
                         return
