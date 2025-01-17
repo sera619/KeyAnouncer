@@ -77,5 +77,5 @@ Version 1.3.0 - Improved Usability
 - add a partyframe to display all keys in group (beta)
 - fix misspells
 - make UI Frames moveable
-- adding libs in .toc
+
   
