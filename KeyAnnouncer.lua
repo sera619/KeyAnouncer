@@ -112,6 +112,38 @@ frame:SetScript("OnDragStop", function(self)
 end)
 frame:Hide()
 
+local changelogFrame = CreateFrame("Frame", "KeyAnnouncerChangelogFrame", UIParent, "BasicFrameTemplateWithInset")
+changelogFrame:SetSize(400, 600)
+changelogFrame:SetPoint("CENTER")
+changelogFrame:SetMovable(true)
+changelogFrame:EnableMouse(true)
+changelogFrame:RegisterForDrag("LeftButton")
+changelogFrame:SetScript("OnDragStart", changelogFrame.StartMoving)
+changelogFrame:SetScript("OnDragStop", function(self)
+    self:StopMovingOrSizing()
+end)
+changelogFrame:Hide()
+
+local changelogTitle = changelogFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightMed2")
+changelogTitle:SetPoint("TOP", changelogFrame,0, -5)
+changelogTitle:SetText("KeyAnnouncer - Changelog")
+changelogTitle:SetTextColor(255, 0, 0, 1)
+
+
+local changelogScrollFrame = CreateFrame("ScrollFrame", nil, changelogFrame, "UIPanelScrollFrameTemplate")
+changelogScrollFrame:SetPoint("TOPLEFT", 0, -30)
+changelogScrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
+
+local changelogContentFrame = CreateFrame("Frame", nil, changelogScrollFrame)
+changelogContentFrame:SetSize(425, 1200)
+changelogScrollFrame:SetScrollChild(changelogContentFrame)
+
+local changelogText = changelogContentFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+changelogText:SetWidth(350)
+changelogText:SetPoint("TOPLEFT", 10, 0)
+changelogText:SetWordWrap(true)
+changelogText:SetText("No Changelog available.")
+
 -- groupKeystones window
 local groupKeystonesFrame = CreateFrame("Frame", "KeyAnnouncerPartyFrame", UIParent, "BasicFrameTemplateWithInset")
 groupKeystonesFrame:SetSize(450, 200)
@@ -146,6 +178,17 @@ keyText:SetWidth(450)
 keyText:SetPoint("TOPLEFT", 0, 0)
 keyText:SetWordWrap(true)
 keyText:SetText("No keys available yet.")
+
+local function SetChangelogText()
+    local changetext = ""
+    for version, notes in pairs(KeyAnnouncerUtils.PatchNotes) do
+        for _, note in ipairs(notes) do
+            changetext = changetext..note.."\n"
+        end
+        changetext = changetext.."\n\n"
+    end
+    changelogText:SetText(changetext)
+end
 
 local function UpdateGroupFrame()
     local displayText = ""
@@ -280,7 +323,7 @@ end)
 
 -- show/hide partyframe button
 local partyFrameButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
-partyFrameButton:SetPoint("CENTER", frame, "CENTER", 0, -100) 
+partyFrameButton:SetPoint("CENTER", frame, "CENTER", 0, -70) 
 partyFrameButton:SetText("Partykeystones")
 partyFrameButton:SetScript("OnClick", function(self)
     if groupKeystonesFrame:IsShown() then
@@ -289,6 +332,19 @@ partyFrameButton:SetScript("OnClick", function(self)
         groupKeystonesFrame:Show()
     end
 end)
+
+-- show/hide changelog frame button 
+local changelogFrameButton = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
+changelogFrameButton:SetPoint("CENTER", frame, "CENTER", 0, -100) 
+changelogFrameButton:SetText("Changelog")
+changelogFrameButton:SetScript("OnClick", function(self)
+    if changelogFrame:IsShown() then
+        changelogFrame:Hide()
+    else
+        changelogFrame:Show()
+    end
+end)
+
 
 -- Version Text
 local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -363,6 +419,7 @@ KeyAnnouncer:SetScript("OnEvent", function(self, event, ...)
         local aName = ...
         if aName == addonName then
             InitializeAddon()
+            SetChangelogText()
             print(PrintAddonCyan(aName).."Addon version "..addonVersion.." loaded successfully.")
         end
     elseif event == "PLAYER_LOGOUT" then
